@@ -16,16 +16,20 @@ def train_runner(model, trainloader, criterion, optimizer):
         ty = ty[..., 1]
 
         cy = cy.unsqueeze(dim=-1)  # (bs, n_context, 1)
-        mu, sigma, moran_y, moran_mu = model(cx, cy, tx, ty)  # (bs, n_target), (bs, n_target)
+        mu, sigma, alpha = model(cx, cy, tx, ty)  # (bs, n_target), (bs, n_target)
 
-        loss = criterion(mu, sigma, ty, moran_y, moran_mu)
+        loss = criterion(mu, sigma, ty, alpha)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
     target_y = ty[0]
-    mean_y = mu[0]
-    var_y = sigma[0]
+    mean_y = (alpha * mu).sum(dim=1, keepdim=True)
+    var_y = (alpha * alpha * sigma).sum(dim=1, keepdim=True)
+    mean_y = mean_y.squeeze(-1)
+    var_y = var_y.squeeze(-1)
+    # mean_y = mu[0]
+    # var_y = sigma[0]
     target_id = t_id[0]
     context_id = c_id[0]
 
@@ -55,17 +59,22 @@ def val_runner(model, testloader, criterion):
 
             val_cy = val_cy.unsqueeze(dim=-1)  # (bs, n_context, 1)
 
-            val_pred_y, val_sigma_y, moran_y, moran_mu = model(val_cx, val_cy, val_tx, val_ty)  # Test
-            val_loss = criterion(val_pred_y, val_sigma_y, val_ty, moran_y, moran_mu
+            val_pred_y, val_sigma_y, val_alpha = model(val_cx, val_cy, val_tx, val_ty)  # Test
+            val_loss = criterion(val_pred_y, val_sigma_y, val_ty, val_alpha
                                  )
             val_target_y = val_ty[0]
-            val_pred_y = val_pred_y[0]
-            val_var_y = val_sigma_y[0]
+            val_pred_y = (val_alpha * val_pred_y).sum(dim=1, keepdim=True)
+            val_var_y = (val_alpha * val_alpha * val_sigma_y).sum(dim=1, keepdim=True)
+            val_pred_y = val_pred_y.squeeze(-1)
+            val_var_y = val_var_y.squeeze(-1)
+            # val_pred_y = val_pred_y[0]
+            # val_var_y = val_sigma_y[0]
             val_target_id = val_t_id[0]
 
     val_index = val_target_id.argsort()
     val_target_id = val_target_id[val_index]
     val_target_y = val_target_y[val_index]
+
     val_pred_y = val_pred_y[val_index]
     val_var_y = val_var_y[val_index]
 

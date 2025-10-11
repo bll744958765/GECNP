@@ -66,23 +66,18 @@ def split(xuhao, seed, dest):
     global test_size
     set_seed(seed=seed)
     if dest == 'generation':
-        data_frame = pd.read_csv(r'./data/generated_data_with_target_T=2.csv')
-        test_size = 0.9
-    if dest == 'generation1':
-        data_frame = pd.read_csv(r'./data/generated_data_with_target_T=1.csv')
-        test_size = 0.9
-    if dest == 'generation3':
         data_frame = pd.read_csv(r'./data/generated_data_with_target_T=3.csv')
-        test_size = 0.9
-    if dest == 'cali':
+
+    elif dest == 'cali':
         data_frame = pd.read_csv(r'./data/fetch_california_housing.csv')
-        test_size = 0.9
-    if dest == 'temperature':
-        data_frame = pd.read_csv(r'./data/1-4_mean.csv')
-        test_size = 0.9
-    if dest == 'Chengdu_housing':
+        
+    elif dest == 'election':
+        data_frame = pd.read_csv(r'./data/election result.csv')
+      
+    else:
         data_frame = pd.read_csv(r'./data/Chengdu_housing.csv')
-        test_size = 0.9
+    test_size = 0.9
+
     all_data = np.array(data_frame)
 
     for i in range(xuhao):
@@ -90,21 +85,12 @@ def split(xuhao, seed, dest):
         save_path = "./trained/data/{}".format(dest)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
-        if dest == 'cali':
-            train_data_orgin, valid_data_orgin = train_test_split(all_data, test_size=test_size, random_state=seed)
-            test_data_orgin, valid_data_orgin = train_test_split(valid_data_orgin, test_size=0.78, random_state=seed)
-            train_data_orgin = pd.DataFrame(train_data_orgin)
-            valid_data_orgin = pd.DataFrame(valid_data_orgin)
-            test_data_orgin = pd.DataFrame(test_data_orgin)
-            train_data_orgin.to_csv(save_path + '/train{}_orgin.csv'.format(i), index=False)
-            valid_data_orgin.to_csv(save_path + '/valid{}_orgin.csv'.format(i), index=False)
-            test_data_orgin.to_csv(save_path + '/test{}_orgin.csv'.format(i), index=False)
-        else:
-            train_data_orgin, valid_data_orgin = train_test_split(all_data, test_size=test_size, random_state=seed)
-            train_data_orgin = pd.DataFrame(train_data_orgin)
-            valid_data_orgin = pd.DataFrame(valid_data_orgin)
-            train_data_orgin.to_csv(save_path + '/train{}_orgin.csv'.format(i), index=False)
-            valid_data_orgin.to_csv(save_path + '/valid{}_orgin.csv'.format(i), index=False)
+       
+        train_data_orgin, valid_data_orgin = train_test_split(all_data, test_size=test_size, random_state=seed)
+        train_data_orgin = pd.DataFrame(train_data_orgin)
+        valid_data_orgin = pd.DataFrame(valid_data_orgin)
+        train_data_orgin.to_csv(save_path + '/train{}_orgin.csv'.format(i), index=False)
+        valid_data_orgin.to_csv(save_path + '/valid{}_orgin.csv'.format(i), index=False)
 
     y = all_data[:, -1]
     x = all_data[:, 1:-1]
@@ -121,25 +107,14 @@ def split(xuhao, seed, dest):
         save_path = "./trained/data/{}".format(dest)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
-        if dest == 'cali':
-            train_data, valid_data = train_test_split(all_data, test_size=test_size, random_state=seed)
-            test_data, valid_data = train_test_split(valid_data, test_size=0.78, random_state=seed)
+        
+        train_data, valid_data = train_test_split(all_data, test_size=test_size, random_state=seed)
 
-            train_data = pd.DataFrame(train_data)
-            valid_data = pd.DataFrame(valid_data)
-            test_data = pd.DataFrame(test_data)
+        train_data = pd.DataFrame(train_data)
+        valid_data = pd.DataFrame(valid_data)
 
-            train_data.to_csv(save_path + '/train{}.csv'.format(i), index=False)
-            valid_data.to_csv(save_path + '/valid{}.csv'.format(i), index=False)
-            test_data.to_csv(save_path + '/test{}.csv'.format(i), index=False)
-        else:
-            train_data, valid_data = train_test_split(all_data, test_size=test_size, random_state=seed)
-
-            train_data = pd.DataFrame(train_data)
-            valid_data = pd.DataFrame(valid_data)
-
-            train_data.to_csv(save_path + '/train{}.csv'.format(i), index=False)
-            valid_data.to_csv(save_path + '/valid{}.csv'.format(i), index=False)
+        train_data.to_csv(save_path + '/train{}.csv'.format(i), index=False)
+        valid_data.to_csv(save_path + '/valid{}.csv'.format(i), index=False)
     return print('train_data:', len(train_data), 'valid_data：', len(valid_data))
 
 
@@ -150,37 +125,28 @@ def data_load(tt, dest):
 
     train_data = np.array(train_data)
     valid_data = np.array(valid_data)
+
     if dest == 'generation':
-        train_x = train_data[:, 1:3]
-        train_y = train_data[:, (0,7)]
-        valid1_x = valid_data[:, 1:3]
+        train_x = train_data[:, 1:7]
+        train_y = train_data[:, (0, 7)]
+        valid1_x = valid_data[:, 1:7]
         valid_y = valid_data[:, (0, 7)]
-    if dest == 'generation1':
-        train_x = train_data[:, 1:3]
-        train_y = train_data[:, (0,7)]
-        valid1_x = valid_data[:, 1:3]
-        valid_y = valid_data[:, (0, 7)]
+    
 
-    if dest == 'generation3':
-        train_x = train_data[:, 1:3]
-        train_y = train_data[:, (0,7)]
-        valid1_x = valid_data[:, 1:3]
-        valid_y = valid_data[:, (0, 7)]
-
-
-    if dest == 'cali':
+    elif dest == 'cali':
         train_x = train_data[:, 1:9]
         train_y = train_data[:, (0, 9)]
         valid1_x = valid_data[:, 1:9]
         valid_y = valid_data[:, (0, 9)]
 
-    if dest == 'temperature':
-        train_x = train_data[:, 1:13]
-        train_y = train_data[:, (0, 13)]
-        valid1_x = valid_data[:, 1:13]
-        valid_y = valid_data[:, (0, 13)]
+    elif dest == 'election':
+        train_x = train_data[:, 1:10]
+        train_y = train_data[:, (0, 10)]
+        valid1_x = valid_data[:, 1:10]
+        valid_y = valid_data[:, (0, 10)]
 
-    if dest == "Chengdu_housing":
+    else:
+        # dest == "Chengdu_housing":
         train_x = train_data[:, 1:14]
         train_y = train_data[:, (0, 14)]
         valid1_x = valid_data[:, 1:14]
@@ -202,9 +168,7 @@ class DatasetGP(Dataset):
     def __init__(self, n_tasks, xuhao, dest,
                  batch_size,
                  n_context_min,
-                 n_context_max,n_target_max ):  #chengduhousing: n_context_max=1100, n_target_max=1480,
-                                        #generation: n_context_max=200, n_target_max=250,
-
+                 n_context_max, n_target_max):  
         super().__init__()
         self.n_tasks = n_tasks
         self.batch_size = batch_size

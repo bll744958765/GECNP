@@ -2,19 +2,16 @@
 
 from dataloader_anp import DatasetGP, DatasetGP_test, data_load
 from model_anp import SpatialNeuralProcess, Criterion
-#from tensorboardX import SummaryWriter
 import torch as torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
 import numpy as np
-import os
 import pandas as pd
 from train_configs import train_runner, val_runner
 from math import sqrt
 import argparse
 from dataloader_anp import split, set_seed
-import random
 from datetime import datetime
 import time
 import warnings
@@ -25,6 +22,9 @@ time.sleep(2)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 warnings.filterwarnings("ignore")
+import os
+
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 
 def main(args):
@@ -39,32 +39,32 @@ def main(args):
     model_name = args.model_name
     encMoe = args.encMoe
     decMoe = args.decMoe
-    # moran = args.moran
     path = args.path
     lam = args.lambd
+
     split(args.xuhao, args.random_state, args.dataset)
     x, y, valid_x, valid_y = data_load(1, args.dataset)
     n_context_min = args.n_context_min
     n_target_max = y.shape[0]
-    n_context_max = n_target_max * 0.8
+    n_context_max = n_target_max * lam
     x_size = x.shape[1]
     y_size = y.shape[1]
     args.checkpoint_path = Path(args.checkpoint_path)
 
     # Tensorboard and logging
     test_ = dataset + '-' + model_name + '-' + '-emb' + str(num_hidden)
-    test_ = test_ + "-lr" + str(start_lr) + "-ep" + str(n_epoches) + "-xuhao" + str(args.xuhao)
+    test_ = test_ + "-lr" + str(start_lr) + "-ep" + str(n_epoches) + "-xuhao" + str(args.xuhao) + "-mix" + str(args.num_components)
     if encMoe:
-        if args.laplace:
+        if args.distance:
             if args.Similarity1:
-                test_ = test_ + "_encMoe" + "_laplace" + "_Similar"
+                test_ = test_ + "_encMoe" + "_distance" + "_Similar"
             else:
-                test_ = test_ + "_encMoe" + "_laplace" + "_linear"
+                test_ = test_ + "_encMoe" + "_distance" + "_linear"
         else:
             if args.Similarity1:
-                test_ = test_ + "_encMoe" + "_eulid" + "_Similar"
+                test_ = test_ + "_encMoe" + "_Similar"
             else:
-                test_ = test_ + "_encMoe" + "_eulid" + "_linear"
+                test_ = test_ + "_encMoe" + "_linear"
     if decMoe:
         test_ = test_ + "_decMoe"
     # if moran:
@@ -92,8 +92,8 @@ def main(args):
         os.makedirs(path + "/trained/{}/result".format(saved_file))
     for xuhao in range(xuhao):
         model = SpatialNeuralProcess(x_size=x_size, y_size=y_size, num_hidden=num_hidden,
-                                     encMoe=args.encMoe, decMoe=args.decMoe, laplace=args.laplace, Similarity1=args.Similarity1).to(device)
-        criterion = Criterion(lam=lam)
+                                     encMoe=args.encMoe, decMoe=args.decMoe, distance=args.distance, Similarity1=args.Similarity1, num_components=args.num_components).to(device)
+        criterion = Criterion()
         optimizer = optim.Adam(model.parameters(), lr=start_lr)
 
         trainset = DatasetGP(n_tasks=n_tasks, xuhao=xuhao, dest=args.dataset, batch_size=batch_size,
@@ -113,8 +113,6 @@ def main(args):
             model.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             start_epoch = checkpoint['epoch'] + 1
-
-
 
         for epoch in range(start_epoch, n_epoches):
             trainloader = DataLoader(trainset, shuffle=True)
@@ -199,7 +197,7 @@ def main(args):
     list1 = []
     list0 = []
     model = SpatialNeuralProcess(x_size=x_size, y_size=y_size, num_hidden=num_hidden,
-                                 encMoe=args.encMoe, decMoe=args.decMoe, laplace=args.laplace, Similarity1=args.Similarity1)
+                                 encMoe=args.encMoe, decMoe=args.decMoe, distance=args.distance, Similarity1=args.Similarity1, num_components=args.num_components)
     model = model.to(device)
     for xuhao in range(args.xuhao):
         dataset = DatasetGP_test(n_tasks=n_tasks, xuhao=xuhao, dest=args.dataset, batch_size=batch_size)
@@ -208,7 +206,7 @@ def main(args):
         # state_dict = torch.load('./checkpoint_anp/checkpoint_{}.pth.tar'.format(xuhao))
         model.load_state_dict(state_dict=state_dict['model'])
         model.eval()
-        criterion = Criterion(lam)
+        criterion = Criterion()
 
         val_pred_y, val_var_y, val_target_id, val_target_y, val_loss, valid_mse = val_runner(model, test_loader, criterion)
 
@@ -264,22 +262,22 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="MoeNP Regression on Spatial Data")
     parser.add_argument('-seed', '--random_state', type=int, default=42)
-    parser.add_argument('-xuhao', '--xuhao', type=int, default=10)
-    parser.add_argument("--epochs", type=int, default=300, help="number of training epochs")
+    parser.add_argument('-xuhao', '--xuhao', type=int, default=2)
+    parser.add_argument("--epochs", type=int, default=3, help="number of training epochs")
     parser.add_argument("--task", type=int, default=30, help="number of task")
     parser.add_argument("--batch_size", type=int, default=1, help="batch size for training")
-    parser.add_argument("--num_hidden", type=int, default=32, help="hidden_dim")
-    parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
-    # parser.add_argument('-EuclideanExpert1', '--EuclideanExpert1', type=bool, default=True)
-    parser.add_argument('-laplace', '--laplace', type=bool, default=False)
+    parser.add_argument("--num_components", type=int, default=5, help="the number of mixture distribution")
+    parser.add_argument("--num_hidden", type=int, default=64, help="hidden_dim")
+    parser.add_argument("--lr", type=float, default=0.01, help="learning rate")
+    parser.add_argument('-distance', '--distance', type=bool, default=True)
     parser.add_argument('-Similarity1', '--Similarity1', type=bool, default=True)
     parser.add_argument('-encMoe', '--encMoe', type=bool, default=True)
     parser.add_argument('-decMoe', '--decMoe', type=bool, default=True)
     # parser.add_argument('-moran', '--moran', type=bool, default=True)
-    parser.add_argument("--lambd", type=float, default=1.0, help="lambda")
-    parser.add_argument('-m', '--model_name', type=str, default='MoxNP', choices=['MoxNP', 'NP'])
+    parser.add_argument("--lambd", type=float, default=0.8, help="nt:nc")
+    parser.add_argument('-m', '--model_name', type=str, default='MoxNP', choices=['MoxNP'])
     parser.add_argument('-d', '--dataset', type=str, default='cali',
-                        choices=['cali', 'Chengdu_housing', 'generation','generation1','generation3', 'temperature'])
+                        choices=['cali', 'Chengdu_housing', 'generation', 'election'])
     parser.add_argument('-n_context_min', '--n_context_min', type=int, default=3)
     parser.add_argument('-p', '--path', type=str, default='./')
     parser.add_argument('--checkpoint_path', type=str, default='Chengdu_housing-MoxNP--emb128-lr0.001-ep300-xuhao10_encMoe_eulid_Similar_decMoe_lam0.1_Nov07_0951', help='Path to save checkpoint')
