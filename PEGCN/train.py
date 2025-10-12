@@ -1,7 +1,7 @@
 # -*- coding : utf-8 -*-
 
-from dataloader_anp import DatasetGP, DatasetGP_test, data_load
-from model_anp import SpatialNeuralProcess, Criterion
+from dataloader import DatasetGP, DatasetGP_test, data_load
+from models import SpatialNeuralProcess, Criterion
 import torch as torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -11,7 +11,7 @@ import pandas as pd
 from train_configs import train_runner, val_runner
 from math import sqrt
 import argparse
-from dataloader_anp import split, set_seed
+from dataloader import split, set_seed
 from datetime import datetime
 import time
 import warnings
@@ -276,11 +276,11 @@ if __name__ == '__main__':
     # parser.add_argument('-moran', '--moran', type=bool, default=True)
     parser.add_argument("--lambd", type=float, default=0.8, help="nt:nc")
     parser.add_argument('-m', '--model_name', type=str, default='MoxNP', choices=['MoxNP'])
-    parser.add_argument('-d', '--dataset', type=str, default='cali',
+    parser.add_argument('-d', '--dataset', type=str, default='generation',
                         choices=['cali', 'Chengdu_housing', 'generation', 'election'])
     parser.add_argument('-n_context_min', '--n_context_min', type=int, default=3)
     parser.add_argument('-p', '--path', type=str, default='./')
-    parser.add_argument('--checkpoint_path', type=str, default='Chengdu_housing-MoxNP--emb128-lr0.001-ep300-xuhao10_encMoe_eulid_Similar_decMoe_lam0.1_Nov07_0951', help='Path to save checkpoint')
+    parser.add_argument('--checkpoint_path', type=str, default='./', help='Path to save checkpoint')
     parser.add_argument('--resume', action='store_true', default=True, help='Resume training from the last checkpoint if available')
 
     args = parser.parse_args()

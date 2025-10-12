@@ -1,10 +1,6 @@
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import numpy as np
-from attention import *
 
-import torch.nn.functional as F
+import torch.nn as nn
+
 
 
 # 定义欧式距离专家
