@@ -1,34 +1,47 @@
 # GECNP: A Gated Expert Conditional Neural Process for Spatial Distribution Learning with Sparse Observations
 
 Official PyTorch implementation of GECNP (Gated Expert Conditional Neural Process) for sparse spatial prediction and uncertainty-aware spatial distribution learning.
+
 GECNP integrates:
 Conditional Neural Processes (CNPs) for context-to-target probabilistic prediction,
+
 Mixture-of-Experts (MoE) for heterogeneous spatial representation learning,
+
 Mixture Density Networks (MDNs) for multimodal predictive uncertainty modeling.
 
 The model is specifically designed for spatial prediction tasks with:
 
 sparse observations,
+
 irregular spatial layouts,
+
 heterogeneous spatial structures,
+
 multimodal target distributions,
+
 and uncertainty-aware inference requirements.
 # Overview
 
 Spatial prediction is a fundamental problem in geostatistics, environmental science, remote sensing, urban computing, and geoscience exploration. Traditional approaches such as Kriging and GWR provide strong statistical interpretability but often struggle with nonlinear relationships and heterogeneous spatial patterns. Deep learning methods improve representation learning capability but frequently lack principled uncertainty quantification.
 
-GECNP addresses these limitations by combining:
+## GECNP addresses these limitations by combining:
 
 Spatially-aware gated expert encoding
+
 Density-based probabilistic decoding
+
 Context-target neural process learning
+
 Multimodal predictive distribution modeling
 
 The framework explicitly models:
 
 spatial autocorrelation,
+
 geographic attribute similarity,
+
 multimodal spatial responses,
+
 and predictive uncertainty.
 
 # Framework Architecture
@@ -54,7 +67,9 @@ The decoder models the predictive distribution as a mixture of Gaussian componen
 It consists of:
 
 Density Experts:Multiple MLP-based Gaussian experts predicting: mean，variance for different latent spatial regimes.
+
 Density Gating Network:Learns adaptive mixture weights for each target query.
+
 This enables:
 multimodal prediction,
 heteroscedastic uncertainty modeling,
@@ -62,12 +77,19 @@ and calibrated probabilistic inference.
 
 ### Key Features
 Spatially-aware neural process framework
+
 Explicit modeling of spatial autocorrelation
+
 Geographic similarity learning
+
 Sparse observation adaptation
+
 Mixture-of-Gaussians predictive distributions
+
 Uncertainty quantification
+
 Flexible context-target learning
+
 End-to-end differentiable training
 
 ## Experimental Setups
