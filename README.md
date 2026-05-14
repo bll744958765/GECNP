@@ -134,9 +134,12 @@ Example Training Configuration:
     --num_experts 3 \
     --num_gaussians 5 \
     --lr 1e-3
+    
   Ablation experiments can be performed directly by modifying:
+  
     command-line arguments,
     or the argparse.ArgumentParser() configuration in train.py.
+    
   Typical ablation settings include:
     Ablation	                Description
     Remove DE	                Remove distance expert
