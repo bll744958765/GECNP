@@ -1,6 +1,64 @@
 # GECNP: A Gated Expert Conditional Neural Process for Spatial Distribution Learning with Sparse Observations
 
-This is a pytorch implementation of GECNP: A Gated-Expert Conditional Neural Process for Spatial Distribution Learning with Sparse Observations
+Official PyTorch implementation of GECNP (Gated Expert Conditional Neural Process) for sparse spatial prediction and uncertainty-aware spatial distribution learning.
+GECNP integrates:
+Conditional Neural Processes (CNPs) for context-to-target probabilistic prediction,
+Mixture-of-Experts (MoE) for heterogeneous spatial representation learning,
+Mixture Density Networks (MDNs) for multimodal predictive uncertainty modeling.
+
+The model is specifically designed for spatial prediction tasks with:
+
+sparse observations,
+irregular spatial layouts,
+heterogeneous spatial structures,
+multimodal target distributions,
+and uncertainty-aware inference requirements.
+# Overview
+
+Spatial prediction is a fundamental problem in geostatistics, environmental science, remote sensing, urban computing, and geoscience exploration. Traditional approaches such as Kriging and GWR provide strong statistical interpretability but often struggle with nonlinear relationships and heterogeneous spatial patterns. Deep learning methods improve representation learning capability but frequently lack principled uncertainty quantification.
+
+GECNP addresses these limitations by combining:
+
+Spatially-aware gated expert encoding
+Density-based probabilistic decoding
+Context-target neural process learning
+Multimodal predictive distribution modeling
+
+The framework explicitly models:
+
+spatial autocorrelation,
+geographic attribute similarity,
+multimodal spatial responses,
+and predictive uncertainty.
+
+# Framework Architecture
+
+The proposed framework contains two major components:
+
+## 1. Gated Expert Encoder (GEEnc)
+
+The encoder learns target-specific latent spatial representations using:
+
+Shared Expert (SE)：Captures global contextual structure shared across the entire spatial domain.
+
+Distance Expert (DE)：Models spatial autocorrelation by emphasizing nearby spatial observations.
+
+Similarity Expert (SimE)：Captures geographically nonlocal but structurally similar patterns using auxiliary attributes.
+
+Gated Expert Fusion (GEF)：Dynamically balances distance-based and similarity-based representations through a learnable gating mechanism.
+
+## 2. Density-Gated Mixture Decoder (DGMDec)
+
+The decoder models the predictive distribution as a mixture of Gaussian components.
+
+It consists of:
+
+Density Experts:Multiple MLP-based Gaussian experts predicting: 
+mean
+variance
+for different latent spatial regimes.
+
+Density Gating Network:Learns adaptive mixture weights for each target query.
 ## Experimental Setups
 All experiments are implemented in the PyTorch framework and optimized using Adam. Training is performed on a single NVIDIA GeForce RTX
 3080 GPU. 
@@ -8,10 +66,10 @@ All experiments are implemented in the PyTorch framework and optimized using Ada
 To comprehensively evaluate the predictive performance of the proposed GECNP model, we adopt five commonly used regression metrics: mean absolute error (MAE), mean squared error (MSE), root mean
 squared error (RMSE), coefficient of determination (R2), and negative log-likelihood (NLL). 
 ## Data
-This method uses the following three datasets for method evaluation: 
-Election: Voting data related to the U.S. presidential election
-California Housing: The classic California housing dataset, used for regression tasks
-
+This method uses the following  datasets for method evaluation: 
+Synthetic Dataset: We construct a regular 50×50 grid to generate spatial coordinates uniformly distributed in the domain [0, 1]×[0, 1].
+Election: Voting data related to the U.S. presidential election.
+California Housing: The classic California housing dataset, used for regression tasks.
 Chengdu_data: Second-hand housing prices in Chengdu
 ##  Experimental Study
 This section presents experiments on synthetic datasets  spatial prediction tasks.
