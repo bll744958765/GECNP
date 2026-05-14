@@ -76,6 +76,7 @@ All experiments are implemented using the PyTorch framework.
 ### Hardware
 GPU: NVIDIA GeForce RTX 3080
 CUDA-enabled training
+
 ### Software
 Python 3.9+
 PyTorch 2.x
@@ -83,14 +84,18 @@ NumPy
 Scikit-learn
 Matplotlib
 Pandas 
+
 ##  Evaluation Metrics
 To comprehensively evaluate the predictive performance of the proposed GECNP model, we adopt five commonly used regression metrics: mean absolute error (MAE), mean squared error (MSE), root mean
 squared error (RMSE), coefficient of determination (R2), and negative log-likelihood (NLL). 
 ## Data
 This method uses the following  datasets for method evaluation: 
 Synthetic Dataset: We construct a regular 50×50 grid to generate spatial coordinates uniformly distributed in the domain [0, 1]×[0, 1]. This synthetic benchmark designed to evaluate: spatial generalization, multimodal prediction, and uncertainty calibration.
+
 Election: Voting data related to the U.S. presidential election.This data was used to evaluate: heterogeneous spatial patterns, socioeconomic spatial effects, and nonstationary geographic relationships.
+
 California Housing: The classic California housing dataset, used for regression tasks.
+
 Chengdu_data: A real-world second-hand housing price dataset collected from Chengdu. This dataset evaluates: urban spatial heterogeneity, sparse regional sampling, real-estate price prediction.
 ##  Experimental Study
 This section presents experiments on synthetic datasets  spatial prediction tasks.
