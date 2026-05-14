@@ -146,11 +146,11 @@ Example Training Configuration:
     
     Remove DE	                Remove distance expert
     
-    Remove SimE	              Remove similarity expert
+    Remove SimE	               Remove similarity expert
     
-    Remove Gating             Replace adaptive fusion with fixed averaging
+    Remove Gating              Replace adaptive fusion with fixed averaging
     
-    Single Gaussian	          Replace MDN with single Gaussian decoder
+    Single Gaussian	           Replace MDN with single Gaussian decoder
     
     Remove Shared Expert	    Remove global contextual aggregation
     
